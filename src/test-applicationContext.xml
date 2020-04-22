@@ -86,9 +86,32 @@
 		</property>	
 	</bean> -->
 
-	<bean id="sqlService" class="toby.user.sqlservice.XmlSqlService">
-		<!-- 파일 이름 지정 -->
+	<!-- <bean id="sqlService" class="toby.user.sqlservice.XmlSqlService">
+		독립시킨 reader, registry 빈을 참조하도록 ref 수정
+		<property name="sqlReader" ref="sqlReader"></property>
+		<property name="sqlRegistry" ref="sqlRegistry"></property>
+		파일 이름 지정
 		<property name="sqlmapFile" value="sqlmap.xml"></property>
+	</bean> -->
+
+	<!-- <bean id="sqlService" class="toby.user.sqlservice.DefaultSqlService">
+	</bean> -->
+
+	<bean id="sqlService" class="toby.user.sqlservice.OxmSqlService">
+		<property name="unmarshaller" ref="unmarshaller"></property>
+		<!-- classpath는 디폴트이므로 생략 가능하다. 클래스패스 위치는 루트부터 절대위치를 적어야 한다. -->
+		<property name="sqlmap" value="classpath:toby/user/dao/sqlmap.xml"></property>
+	</bean>
+	
+	<bean id="unmarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+		<property name="contextPath" value="toby.user.sqlservice.jaxb"></property>
+	</bean>
+	
+	<bean id="sqlReader" class="toby.user.sqlservice.JaxbXmlSqlReader">	
+		<property name="sqlmapFile" value="sqlmap.xml"></property>
+	</bean>
+
+	<bean id="sqlRegistry" class="toby.user.sqlservice.HashMapSqlRegistry">	
 	</bean>
 	
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
