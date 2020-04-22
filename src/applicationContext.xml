@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- context인 UserDao와 의존 object인 Dconnection을 생성 -->
+<beans xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd" 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans">
+	<!-- 의존 object -->
+	<!-- <bean id="connectionMaker" class="toby.user.dao.DConnectionMaker"></bean> -->
+	
+	<!-- context -->
+	<!-- <bean id="userDao" class="toby.user.dao.UserDao">
+		<property name="connectionMaker" ref="connectionMaker"></property>
+	</bean> -->
+	
+	<!-- 설정 정보를 사용자 정의 클래스가 아닌 xml로 하기 -->
+	<!-- 의존 object -->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql://localhost/toby?serverTimezone=UTC"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="1234"></property>
+	</bean>
+	
+	<bean id="userDao" class="toby.user.dao.UserDao">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+</beans>

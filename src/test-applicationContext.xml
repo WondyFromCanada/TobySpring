@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- context인 UserDao와 의존 object인 Dconnection을 생성 -->
+<beans xsi:schemaLocation="http://www.springframework.org/schema/beans 
+							http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+							http://www.springframework.org/schema/aop 
+							http://www.springframework.org/schema/aop/spring-aop-3.0.xsd  
+							http://www.springframework.org/schema/tx  
+							http://www.springframework.org/schema/tx/spring-tx-3.0.xsd 
+							http://www.springframework.org/schema/context  
+							http://www.springframework.org/schema/context/spring-context-3.0.xsd" 
+   		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   		xmlns:aop="http://www.springframework.org/schema/aop"
+   		xmlns:tx="http://www.springframework.org/schema/tx"
+   		xmlns:context="http://www.springframework.org/schema/context"
+   		xmlns="http://www.springframework.org/schema/beans">
+   		
+   		<!-- @Transactional이 붙은 타입과 메소드에 트랜잭션 부가기능을 담은 프록시를 추가하도록 만들어주는 후처리기 등록 -->
+   		<tx:annotation-driven/>
+   		<!-- 코드의 애노테이션을 이용해서 부가적인 빈 설정 또는 초기화 작업을 해주는 후처리기 등록 -->
+   		<context:annotation-config></context:annotation-config>
+	<!-- 의존 object -->
+	<!-- <bean id="connectionMaker" class="toby.user.dao.DConnectionMaker"></bean> -->
+	
+	<!-- context -->
+	<!-- <bean id="userDao" class="toby.user.dao.UserDao">
+		<property name="connectionMaker" ref="connectionMaker"></property>
+	</bean> -->
+	
+	<!-- 설정 정보를 사용자 정의 클래스가 아닌 xml로 하기 -->
+	<!-- 의존 object -->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql://localhost/testdb?serverTimezone=UTC"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="1234"></property>
+	</bean>
+	
+	<!-- <bean id="userService" class="toby.user.service.UserServiceTx">
+		<property name="transactionManager" ref="transactionManager"></property>
+		<property name="userService" ref="userServiceImpl"></property>
+	</bean> -->
+
+	<!-- <bean id="userService" class="toby.user.service.TxProxyFactoryBean">
+		<property name="target" ref="userServiceImpl"></property>
+		<property name="transactionManager" ref="transactionManager"></property>
+		<property name="pattern" value="upgradeLevels"></property>
+		<property name="serviceInterface" value="toby.user.service.UserService"></property>
+	</bean> -->
+
+	<!-- <bean id="userService" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="userServiceImpl"></property>
+		<property name="interceptorNames">
+			<list>
+				<value>transactionAdvisor</value>
+			</list>
+		</property>
+	</bean> -->
+	
+	<bean id="userService" class="toby.user.service.UserServiceImpl">
+		<property name="userDao" ref="userDao"></property>
+		<!-- <property name="dataSource" ref="dataSource"></property> -->
+		<!-- <property name="transactionManager" ref="transactionManager"></property> -->
+		<property name="mailSender" ref="mailSender"></property>
+	</bean>
+
+	<bean id="testUserService" class="toby.user.service.UserServiceTest$TestUserServiceImpl" parent="userService"></bean>
+
+	<bean id="userDao" class="toby.user.dao.UserDaoJdbc">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="sqlService" ref="sqlService"></property>
+		<!-- <property name="sqlAdd" value="INSERT INTO USERS(ID, NAME, PASSWORD, EMAIL, LEVEL, LOGIN, RECOMMEND) VALUES (?,?,?,?,?,?,?)"></property> -->		
+		<!-- <property name="jdbcContext" ref="jdbcContext"></property> -->
+	</bean>
+	
+	<!-- [test-applicationContext.xml 수정]<bean id="sqlService" class="toby.user.sqlservice.SimpleSqlService">
+		<property name="sqlMap">
+			<map>
+				<entry key="userAdd" value="INSERT INTO USERS(ID, NAME, PASSWORD, EMAIL, LEVEL, LOGIN, RECOMMEND) VALUES (?,?,?,?,?,?,?)"></entry>
+				<entry key="userGet" value="SELECT * FROM USERS WHERE ID=?"></entry>
+				<entry key="userGetAll" value="SELECT * FROM USERS ORDER BY ID"></entry>
+				<entry key="userDeleteAll" value="DELETE FROM USERS"></entry>
+				<entry key="userGetCount" value="SELECT COUNT(*) FROM USERS"></entry>
+				<entry key="userUpdate" value="UPDATE USERS SET NAME=?, PASSWORD=?, EMAIL=?, LEVEL=?, LOGIN=?, RECOMMEND=? WHERE ID=?"></entry>
+			</map>
+		</property>	
+	</bean> -->
+
+	<bean id="sqlService" class="toby.user.sqlservice.XmlSqlService">
+		<!-- 파일 이름 지정 -->
+		<property name="sqlmapFile" value="sqlmap.xml"></property>
+	</bean>
+	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<bean id="mailSender" class="toby.user.service.DummyMailSender">
+		<!-- <property name="host" value="mail.server.com"></property> -->	
+	</bean>
+	
+	<!-- <bean id="jdbcContext" class="toby.user.dao.JdbcContext">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean> -->
+	
+	<!-- <bean id="transactionAdvice" class="toby.user.service.TransactionAdvice">
+		<property name="transactionManager" ref="transactionManager"></property>	
+	</bean> -->
+
+	<!-- <bean id="transactionAdvice" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager" ref="transactionManager"></property>	
+		<property name="transactionAttributes">
+			<props>
+				<prop key="get*">PROPAGATION_REQUIRED, readOnly</prop>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>	
+	</bean> -->
+
+	<!-- <bean id="transactionPointcut" class="org.springframework.aop.support.NameMatchMethodPointcut">
+		<property name="mappedName" value="upgrade*"></property>	
+	</bean> -->
+
+	<!-- <bean id="transactionPointcut" class="toby.learningtest.jdk.proxy.NameMatchClassMethodPointcut">
+		<property name="mappedClassName" value="*ServiceImpl"></property>	
+		<property name="mappedName" value="upgrade*"></property>	
+	</bean> -->
+
+	<!-- <bean id="transactionPointcut" class="org.springframework.aop.aspectj.AspectJExpressionPointcut">
+		<property name="expression" value="execution(* *..*ServiceImpl.upgrade*(..))"></property>	
+	</bean> -->
+	
+	<!-- <bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+		<property name="advice" ref="transactionAdvice"></property>	
+		<property name="pointcut" ref="transactionPointcut"></property>	
+	</bean> -->
+	
+	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"></bean>
+	
+	<aop:config>
+   		<aop:advisor advice-ref="transactionAdvice" pointcut="bean(*Service)" />
+   		<!-- <aop:advisor advice-ref="transactionAdvice" pointcut="execution(* *..*ServiceImpl.upgrade*(..))" /> -->
+   		<!-- <aop:pointcut expression="execution(* *..*ServiceImpl.upgrade*(..))" id="transactionPointcut"/>
+   		<aop:advisor advice-ref="transactionAdvice" pointcut-ref=""/> -->
+   	</aop:config>
+   		
+   	<tx:advice id="transactionAdvice">
+   		<tx:attributes>
+   			<tx:method name="get*" read-only="true"/>
+   			<tx:method name="*"/>
+   		</tx:attributes>
+   	</tx:advice>
+</beans>

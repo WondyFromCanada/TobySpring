@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/sqlmap" xmlns:tns="http://www.example.org/sqlmap" elementFormDefault="qualified">
+	<element name="sqlmap"> <!-- <sqlmap> 엘리먼트를 정의한다. -->
+		<complexType>
+			<sequence>
+				<!-- maxOccurs : 필요한 개수만큼 <sql>을 포함할 수 있게 한다. -->
+				<element name="sql" maxOccurs="unbounded" type="tns:sqlType"></element>
+			</sequence>
+		</complexType>
+	</element>
+	
+	<complexType name="sqlType">
+		<simpleContent>
+			<extension base="string">
+				<attribute name="key" use="required" type="string"></attribute>
+			</extension>
+		</simpleContent>
+	</complexType>
+</schema>
