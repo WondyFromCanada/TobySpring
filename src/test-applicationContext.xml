@@ -8,11 +8,14 @@
 							http://www.springframework.org/schema/tx  
 							http://www.springframework.org/schema/tx/spring-tx-3.0.xsd 
 							http://www.springframework.org/schema/context  
-							http://www.springframework.org/schema/context/spring-context-3.0.xsd" 
+							http://www.springframework.org/schema/context/spring-context-3.0.xsd
+							http://www.springframework.org/schema/jdbc  
+							http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd" 
    		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
    		xmlns:aop="http://www.springframework.org/schema/aop"
    		xmlns:tx="http://www.springframework.org/schema/tx"
    		xmlns:context="http://www.springframework.org/schema/context"
+   		xmlns:jdbc="http://www.springframework.org/schema/jdbc"
    		xmlns="http://www.springframework.org/schema/beans">
    		
    		<!-- @Transactional이 붙은 타입과 메소드에 트랜잭션 부가기능을 담은 프록시를 추가하도록 만들어주는 후처리기 등록 -->
@@ -100,7 +103,8 @@
 	<bean id="sqlService" class="toby.user.sqlservice.OxmSqlService">
 		<property name="unmarshaller" ref="unmarshaller"></property>
 		<!-- classpath는 디폴트이므로 생략 가능하다. 클래스패스 위치는 루트부터 절대위치를 적어야 한다. -->
-		<property name="sqlmap" value="classpath:toby/user/dao/sqlmap.xml"></property>
+		<!-- <property name="sqlmap" value="classpath:toby/user/dao/sqlmap.xml"></property> -->
+		<property name="sqlRegistry" ref="sqlRegistry"></property>
 	</bean>
 	
 	<bean id="unmarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
@@ -111,7 +115,14 @@
 		<property name="sqlmapFile" value="sqlmap.xml"></property>
 	</bean>
 
-	<bean id="sqlRegistry" class="toby.user.sqlservice.HashMapSqlRegistry">	
+	<!-- <bean id="sqlRegistry" class="toby.user.sqlservice.HashMapSqlRegistry">	
+	</bean> -->
+	
+	<!-- <bean id="sqlRegistry" class="toby.user.sqlservice.updatable.ConcurrentHashMapSqlRegistry">
+	</bean> -->
+
+	<bean id="sqlRegistry" class="toby.user.sqlservice.updatable.EmbeddedDbSqlRegistry">
+		<property name="dataSource" ref="embeddedDatabase"></property>
 	</bean>
 	
 	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
@@ -173,4 +184,8 @@
    			<tx:method name="*"/>
    		</tx:attributes>
    	</tx:advice>
+   	
+   	<jdbc:embedded-database id="embeddedDatabase" type="HSQL">
+   		<jdbc:script location="classpath:toby/user/sqlservice/updatable/sqlRegistrySchema.sql"></jdbc:script>
+   	</jdbc:embedded-database>
 </beans>

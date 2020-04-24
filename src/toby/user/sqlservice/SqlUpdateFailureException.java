@@ -1,7 +1,6 @@
 package toby.user.sqlservice;
 
-public class SqlUpdateFailureException extends Exception {
-
+public class SqlUpdateFailureException extends RuntimeException {
 	public SqlUpdateFailureException() {
 		super();
 	}

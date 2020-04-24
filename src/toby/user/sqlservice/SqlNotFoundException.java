@@ -1,6 +1,6 @@
 package toby.user.sqlservice;
 
-public class SqlNotFoundException extends Exception {
+public class SqlNotFoundException extends RuntimeException {
 	public SqlNotFoundException() {
 		super();
 	}
