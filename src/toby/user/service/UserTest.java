@@ -5,14 +5,17 @@ import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import toby.AppContext;
 import toby.user.domain.Level;
 import toby.user.domain.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="/test-applicationContext.xml")
+@ActiveProfiles("test")
+@ContextConfiguration(classes=AppContext.class)
 public class UserTest {
 	User user;
 	

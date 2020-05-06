@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.dao.TransientDataAccessResourceException;
 import org.springframework.mail.MailException;
@@ -13,6 +14,7 @@ import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
+import toby.AppContext;
 import toby.user.dao.MockUserDao;
 import toby.user.dao.UserDao;
 import toby.user.domain.Level;
@@ -44,7 +47,8 @@ import static toby.user.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
 import static toby.user.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="/test-applicationContext.xml")
+@ActiveProfiles("test")
+@ContextConfiguration(classes=AppContext.class)
 //@Transactional
 //롤백 여부에 대한 기본 설정과 트랜잭션 매니저 빈을 지정하는 데 사용할 수 있다. 디폴트 트랜잭션 매니저 아이디는 관례를 따라서 transactionManager로 되어 있다.
 //@TransactionConfiguration(defaultRollback=false)
@@ -53,8 +57,8 @@ public class UserServiceTest {
 	UserService userService;
 	@Autowired
 	UserDao userDao;
-	@Autowired
-	DataSource dataSource;
+	/*@Autowired
+	DataSource dataSource;*/
 	@Autowired
 	PlatformTransactionManager transactionManager;
 	@Autowired
@@ -267,7 +271,7 @@ public class UserServiceTest {
 		}
 	}
 	
-	static class TestUserServiceImpl extends UserServiceImpl {
+	public static class TestUserServiceImpl extends UserServiceImpl {
 		private String id = "user4";
 
 		public TestUserServiceImpl() {}
@@ -335,5 +339,15 @@ public class UserServiceTest {
 		} finally {
 			transactionManager.rollback(txStatus);
 		}*/
+	}
+	
+	@Autowired
+	DefaultListableBeanFactory bf;
+	
+	@Test
+	public void beans() {
+		for(String n : bf.getBeanDefinitionNames()) {
+			System.out.println(n + " \t" + bf.getBean(n).getClass().getName());
+		}
 	}
 }

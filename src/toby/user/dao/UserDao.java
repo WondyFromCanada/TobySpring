@@ -10,5 +10,5 @@ public interface UserDao {
 	void deleteAll();
 	int getCount();
 	List<User> getAll();
-	public void update(User user1);
+	public void update(User user);
 }

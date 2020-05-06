@@ -1,5 +1,7 @@
 package toby.user.dao;
 
+import javax.sql.DataSource;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,6 +9,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,27 +17,30 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
-import com.mysql.cj.exceptions.MysqlErrorNumbers;
 import com.sun.crypto.provider.RSACipher;
 import toby.user.domain.Level;
 import toby.user.domain.User;
 import toby.user.sqlservice.SqlService;
 
 /* context */
+@Repository
 public class UserDaoJdbc implements UserDao {
 	//private ConnectionMaker connectionMaker;
-	private SimpleDriverDataSource dataSource;
+	//private SimpleDriverDataSource dataSource;
 	private JdbcTemplate jdbcTemplate;
 	//private String sqlAdd;
 	//private Map<String, String> sqlMap;
+	@Autowired
 	private SqlService sqlService;
 	
 	public UserDaoJdbc() {}
 	
-	public void setSqlService(SqlService sqlService) {
+	/*public void setSqlService(SqlService sqlService) {
 		this.sqlService = sqlService;
-	}
+	}*/
 	
 	/*public void setSqlAdd(String sqlAdd) {
 		this.sqlAdd = sqlAdd;
@@ -63,11 +69,16 @@ public class UserDaoJdbc implements UserDao {
 	};
 	/*private JdbcContext jdbcContext;*/
 	
-	public void setDataSource(SimpleDriverDataSource dataSource) {
+	/*public void setDataSource(SimpleDriverDataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 		this.dataSource = dataSource;
-	}
-	
+	}*/
+
+	@Autowired
+	public void setDataSource(DataSource dataSource) {
+                this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
 	/*public void setJdbcContext(JdbcContext jdbcContext) {
 		this.jdbcContext = jdbcContext;
 	}*/

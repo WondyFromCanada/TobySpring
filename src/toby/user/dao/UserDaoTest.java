@@ -4,6 +4,7 @@ import static org.junit.Assert.assertThat;
 
 import java.sql.SQLException;
 import java.util.List;
+import javax.sql.DataSource;
 
 import org.junit.Before;
 
@@ -13,6 +14,7 @@ import org.junit.Test;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -22,21 +24,24 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import toby.AppContext;
 import toby.user.domain.Level;
 import toby.user.domain.User;
 
 /* client */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations="/test-applicationContext.xml")
+@ActiveProfiles("test")
+@ContextConfiguration(classes=AppContext.class)
 public class UserDaoTest {
-	@Autowired
-	private ApplicationContext context;
+	/*@Autowired
+	private ApplicationContext context;*/
 	//setUp() 메소드에서 만드는 오브젝트를 테스트 메소드에서 사용할 수 있도록 인스턴스 변수로 선언한다.
 	@Autowired
-	UserDaoJdbc dao; //UserDao 타입 빈을 직접 DI 받는다.
+	UserDao dao; //UserDao 타입 빈을 직접 DI 받는다.
 	
 	private User user1;
 	private User user2;
@@ -46,7 +51,7 @@ public class UserDaoTest {
 	public void setUp() {
 		//ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
 		
-		this.dao = context.getBean("userDao", UserDaoJdbc.class);
+		//this.dao = context.getBean("userDao", UserDaoJdbc.class);
 		
 		this.user1 = new User("dongko", "김동코", "5678", "dhkim@naver.com", Level.BASIC, 1, 0);
 		this.user2 = new User("sunji", "김선지", "1004", "sunji6@naver.com", Level.SILVER, 55, 10);
@@ -92,7 +97,7 @@ public class UserDaoTest {
 	// 2020-03-25 JUnit 프레임워크에서 동작할 수 있는 테스트 메소드로 변환
 	@Test //JUnit 에게 테스트용 메소드임을 알려준다.
 	// 테스트의 의도가 무엇인지 알 수 있는 이름 권장
-	public void addAndGet() throws Exception { //JUnit 테스트 메소드는 반드시 public 으로 선언되어야 한다.
+	public void addAndGet() { //JUnit 테스트 메소드는 반드시 public 으로 선언되어야 한다.
 		// GenericXmlApplicationContext : 항상 root에서부터 시작하는 클래스패스, /는 생략 가능
 		// ClassPathXmlApplicationContext : xml과 같은 클래스패스에 있는 클래스 오브젝트를 넘겨서 클래스패스에 대한 힌트를 제공 p.135
 		//ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
@@ -128,7 +133,7 @@ public class UserDaoTest {
 	}
 	
 	@Test
-	public void count() throws Exception {
+	public void count() {
 		//ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
 		
 		//UserDao dao = context.getBean("userDao", UserDao.class);
@@ -150,7 +155,7 @@ public class UserDaoTest {
 	}
 	
 	@Test(expected=EmptyResultDataAccessException.class)
-	public void getUserFailure() throws Exception {
+	public void getUserFailure() throws SQLException {
 		//ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
 		
 		//UserDao dao = context.getBean("userDao", UserDao.class);
@@ -161,7 +166,7 @@ public class UserDaoTest {
 	}
 	
 	@Test
-	public void getAll() throws Exception {
+	public void getAll() {
 		dao.deleteAll();
 		
 		List<User> users0 = dao.getAll();

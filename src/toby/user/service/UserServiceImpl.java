@@ -14,11 +14,14 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.sql.DataSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -28,12 +31,15 @@ import toby.user.dao.UserDao;
 import toby.user.domain.Level;
 import toby.user.domain.User;
 
+@Service("userService")
 public class UserServiceImpl implements UserService{
-	UserDao userDao;
+	@Autowired
+	private UserDao userDao;
 	public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
 	public static final int MIN_RECCOMEND_FOR_GOLD = 30;
-	private DataSource dataSource;
-	private PlatformTransactionManager transactionManager;
+	//private DataSource dataSource;
+	//private PlatformTransactionManager transactionManager;
+	@Autowired
 	private MailSender mailSender;
 	
 	public UserServiceImpl() {}
@@ -43,14 +49,14 @@ public class UserServiceImpl implements UserService{
 	}
 	
 	//프로퍼티 이름은 관례를 따라 transactionManager 라고 만든다.
-	public void setTransactionManager(PlatformTransactionManager transactionManager) {
+	/*public void setTransactionManager(PlatformTransactionManager transactionManager) {
 		this.transactionManager = transactionManager;
 	}
 	
 	//Connection을 생성할 때 사용할 DataSource를 DI 받는다.
 	public void setDataSource(DataSource dataSource) {
 		this.dataSource = dataSource;
-	}
+	}*/
 	
 	public void setUserDao(UserDao userDao) {
 		this.userDao = userDao;

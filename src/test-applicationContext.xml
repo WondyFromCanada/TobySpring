@@ -21,7 +21,7 @@
    		<!-- @Transactional이 붙은 타입과 메소드에 트랜잭션 부가기능을 담은 프록시를 추가하도록 만들어주는 후처리기 등록 -->
    		<tx:annotation-driven/>
    		<!-- 코드의 애노테이션을 이용해서 부가적인 빈 설정 또는 초기화 작업을 해주는 후처리기 등록 -->
-   		<context:annotation-config></context:annotation-config>
+   		<!-- <context:annotation-config></context:annotation-config> -->
 	<!-- 의존 object -->
 	<!-- <bean id="connectionMaker" class="toby.user.dao.DConnectionMaker"></bean> -->
 	
@@ -34,7 +34,7 @@
 	<!-- 의존 object -->
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
 		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
-		<property name="url" value="jdbc:mysql://localhost/testdb?serverTimezone=UTC"></property>
+		<property name="url" value="jdbc:mysql://localhost/testdb?characterEncoding=UTF-8"></property>
 		<property name="username" value="root"></property>
 		<property name="password" value="1234"></property>
 	</bean>
